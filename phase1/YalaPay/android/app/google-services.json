@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "218964289421",
+    "project_id": "payapp-cf99c",
+    "storage_bucket": "payapp-cf99c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218964289421:android:a52dba1b0bba632827bfc4",
+        "android_client_info": {
+          "package_name": "com.payApp.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGeJtQ8lGh5gEgC8nLu-c8dAepkzlFwPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

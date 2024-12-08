@@ -1,26 +1,4 @@
-// import 'package:flash_news/routes/app_routes.dart';
-// import 'package:flutter/material.dart';
 
-// class ShellScreen extends StatelessWidget {
-//   final Widget? child;
-
-//   const ShellScreen({super.key, this.child});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (child == null) {
-//       WidgetsBinding.instance.addPostFrameCallback((_) {
-//         Navigator.of(context).pushReplacementNamed(AppRouter.listScreen.name);
-//       });
-//     }
-
-//     return Scaffold(
-//       body: child ??
-//           Center(
-//               child: CircularProgressIndicator()), // Optional loading indicator
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickmart/routes/app_router.dart';

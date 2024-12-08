@@ -7,7 +7,7 @@ class Cheque {
   String status; // Mutable for status updates
   final DateTime receivedDate;
   final DateTime dueDate;
-  final String chequeImageUri;
+ String chequeImageUri;
 
   Cheque({
     required this.chequeNo,
@@ -45,4 +45,30 @@ class Cheque {
       'chequeImageUri': chequeImageUri,
     };
   }
+
+
+ Cheque copyWith({
+    int? chequeNo,
+    double? amount,
+    String? drawer,
+    String? bankName,
+    String? status,
+    DateTime? receivedDate,
+    DateTime? dueDate,
+    String? chequeImageUri,
+  }) {
+    return Cheque(
+      chequeNo: chequeNo ?? this.chequeNo,
+      amount: amount ?? this.amount,
+      drawer: drawer ?? this.drawer,
+      bankName: bankName ?? this.bankName,
+      status: status ?? this.status,
+      receivedDate: receivedDate ?? this.receivedDate,
+      dueDate: dueDate ?? this.dueDate,
+      chequeImageUri: chequeImageUri ?? this.chequeImageUri,
+    );
+  }
+
+
+
 }

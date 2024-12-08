@@ -35,7 +35,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
     final invoices = ref.watch(invoiceNotifierProvider);
     final payments = ref.watch(paymentNotifierProvider);
 
-    final filteredPayments = payments.where((payment) {
+    final filteredPayments = payments.where((payment) { //make a filtering method inside the provider 
       final matchesSearch =
           payment.invoiceNo.contains(_searchController.text) ||
               payment.amount.toString().contains(_searchController.text) ||

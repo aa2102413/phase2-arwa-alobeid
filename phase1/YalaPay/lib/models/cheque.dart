@@ -1,6 +1,6 @@
 // cheque.dart
 class Cheque {
-  final int chequeNo;
+  int chequeNo;
   final double amount;
   final String drawer;
   final String bankName;

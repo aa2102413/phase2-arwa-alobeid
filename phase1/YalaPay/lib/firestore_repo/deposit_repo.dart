@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DepositRepo {
-  final CollectionReference deposits;
+// class DepositRepo {
+//   final CollectionReference deposits;
 
-  DepositRepo({required this.deposits});
+//   DepositRepo({required this.deposits});
   
-}
+// }

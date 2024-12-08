@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+ import 'package:cloud_firestore/cloud_firestore.dart';
 
-class InvoiceRepo {
-  final CollectionReference invoiceRef;
+// class InvoiceRepo {
+//   final CollectionReference invoiceRef;
 
-  InvoiceRepo({required this.invoiceRef});
-}
+//   InvoiceRepo({required this.invoiceRef});
+// }

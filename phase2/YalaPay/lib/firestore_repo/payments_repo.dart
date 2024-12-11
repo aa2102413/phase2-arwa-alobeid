@@ -1,14 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quickmart/firestore_repo/cheque_repo.dart';
 import 'package:quickmart/models/invoice.dart';
 import 'package:quickmart/models/payment.dart';
-
+//chequeRef=ChequeRepo
+//invoices
 class PaymentRepo {
   final CollectionReference paymentRef;//done
   final CollectionReference invoiceRef; //done
+   //final CollectionReference chequeRef;
 
   PaymentRepo({required this.paymentRef, required this.invoiceRef});
 
-//invoices
   Stream<List<Invoice>> observeInvoices() {
     return invoiceRef.snapshots().map((snapshot) {
       return snapshot.docs

@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:quickmart/firestore_providers/payment_provider.dart';
+import 'package:quickmart/firestore_repo/payments_repo.dart';
 import 'package:quickmart/models/bank_account.dart';
 import 'package:quickmart/models/cheque.dart';
+import 'package:quickmart/models/payment.dart';
 
 class ManageCashingChequesRepo {
   final CollectionReference chequeRef;
@@ -14,16 +17,23 @@ class ManageCashingChequesRepo {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   //cheques
+  //final PaymentProvider = ref.read(paymentNotifierProvider);
+//List<Payment>  p= PaymentProvider.
 
-  Stream<List<Cheque>> observeCheques() { // Fetch cheques
+//   late final PaymentRepo pr;
+//   void addPayment(Payment payment) async {
+//     pr.addPayment(payment);
+//  Stream<List<Payment>> p=  pr.observePayments();
+//   }
+
+  Stream<List<Cheque>> observeCheques() {
+    // Fetch cheques
     return chequeRef.snapshots().map((snapshot) {
       return snapshot.docs
           .map((doc) => Cheque.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     });
   }
-
-
 
   Future<Cheque?> getChequeById(String chequeNo) =>
       chequeRef.doc(chequeNo).get().then((snapshot) {
@@ -61,30 +71,19 @@ class ManageCashingChequesRepo {
         final ref = _storage.refFromURL(cheque.chequeImageUri);
         await ref.delete();
       }
-    //  await chequeRef.delete();
+      //  await chequeRef.delete();
     }
   }
-
-
 
   //------------
 
   Future<void> updateCheque(Cheque cheque) async {
-    String? newchequeNo =cheque.chequeNo.toString();
+    String? newchequeNo = cheque.chequeNo.toString();
     chequeRef.doc(newchequeNo).update(cheque.toJson());
   }
 //////-------------------
 
-
-
-
-
 /////-------------------
-
-
-
-
-
 
 //bank accounts
 
@@ -97,11 +96,7 @@ class ManageCashingChequesRepo {
   }
 
   Future<BankAccount?> getbankaccountByaccountName(String accountName) =>
-     bankaccountRef.doc(accountName).get().then((snapshot) {
+      bankaccountRef.doc(accountName).get().then((snapshot) {
         return BankAccount.fromJson(snapshot.data() as Map<String, dynamic>);
       });
-
-
-
-
 }

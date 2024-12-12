@@ -28,6 +28,17 @@ class Payment {
         chequeNo.toString().contains(text);
   }
 
+    Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'invoiceNo': invoiceNo,
+      'amount': amount,
+      'paymentDate': paymentDate,
+      'paymentMode': paymentMode,
+      'chequeNo': chequeNo,
+    };
+  }
+
   @override
   String toString() {
     return 'Payment{id: $id, invoiceNo: $invoiceNo, amount: $amount, paymentDate: $paymentDate, paymentMode: $paymentMode, chequeNo: $chequeNo}';

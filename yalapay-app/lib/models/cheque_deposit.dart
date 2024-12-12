@@ -17,6 +17,16 @@ class ChequeDeposit {
     );
   }
 
+   Map<String, dynamic> toJson() {
+    return {
+      'id': id.toString(),
+      'depositDate': depositDate.toIso8601String(),
+      'bankAccountNo': bankAccountNo,
+      'status': status,
+      'chequeNos': chequeNos,
+    };
+  }
+
   bool containsText(String text) {
     final lowerText = text.toLowerCase();
     return id.toString().contains(text) ||

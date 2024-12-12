@@ -11,31 +11,29 @@ class Cheque {
   DateTime cashedDate = DateTime.now();
 
   Cheque(
-  this.chequeNo, 
-  this.amount, 
-  this.drawer, 
-  this.bankName, 
-  this.status, 
-  this.receivedDate, 
-  this.dueDate, 
-  this.chequeImageUri, 
-  this.returnReason, 
-  this.cashedDate
-  );
+      this.chequeNo,
+      this.amount,
+      this.drawer,
+      this.bankName,
+      this.status,
+      this.receivedDate,
+      this.dueDate,
+      this.chequeImageUri,
+      this.returnReason,
+      this.cashedDate);
 
- factory Cheque.fromJson(Map<String, dynamic> json) {
+  factory Cheque.fromJson(Map<String, dynamic> json) {
     return Cheque(
-      json['chequeNo'],
-      json['amount'],
-      json['drawer'],
-      json['bankName'],
-      json['status'],
-      DateTime.parse(json['receivedDate']),
-      DateTime.parse(json['dueDate']),
-      json['chequeImageUri'],
-      '',
-      DateTime.now()
-    );
+        json['chequeNo'],
+        json['amount'],
+        json['drawer'],
+        json['bankName'],
+        json['status'],
+        DateTime.parse(json['receivedDate']),
+        DateTime.parse(json['dueDate']),
+        json['chequeImageUri'],
+        '',
+        DateTime.now());
   }
 
   bool containsText(String text) {
@@ -48,6 +46,40 @@ class Cheque {
         receivedDate.toString().contains(text) ||
         dueDate.toString().contains(text);
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'chequeNo': chequeNo,
+      'amount': amount,
+      'drawer': drawer,
+      'bankName': bankName,
+      'status': status,
+      'receivedDate': receivedDate.toIso8601String(),
+      'dueDate': dueDate.toIso8601String(),
+      'chequeImageUri': chequeImageUri,
+    };
+  }
+
+  // Cheque copyWith({
+  //   int? chequeNo,
+  //   double? amount,
+  //   String? drawer,
+  //   String? bankName,
+  //   String? status,
+  //   DateTime? receivedDate,
+  //   DateTime? dueDate,
+  //   String? chequeImageUri,
+  // }) {
+  //   return Cheque(
+  //       chequeNo ?? this.chequeNo,
+  //       amount ?? this.amount,
+  //       drawer ?? this.drawer,
+  //       bankName ?? this.bankName,
+  //       status ?? this.status,
+  //       receivedDate ?? this.receivedDate,
+  //       dueDate ?? this.dueDate,
+  //       chequeImageUri ?? this.chequeImageUri);
+  // }
 
   @override
   String toString() {

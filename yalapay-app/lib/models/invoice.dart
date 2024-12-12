@@ -28,6 +28,17 @@ class Invoice {
         invoiceDate.toString().contains(text) ||
         dueDate.toString().contains(text);
   }
+   Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'customerId': customerId,
+      'customerName': customerName,
+      'amount': amount,
+      'invoiceDate': invoiceDate,
+      'dueDate': dueDate,
+    };
+  }
+
 
   @override
   String toString() {

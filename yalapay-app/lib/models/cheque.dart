@@ -60,7 +60,14 @@ class Cheque {
     };
   }
 
-  // Cheque copyWith({
+ 
+
+  @override
+  String toString() {
+    return 'Cheque No: $chequeNo, Amount: $amount, Drawer: $drawer, Bank: $bankName, Status: $status, Received Date: $receivedDate, Due Date: $dueDate, Cheque Image: $chequeImageUri, Return Reason: $returnReason, Cashed Date: $cashedDate';
+  }
+}
+ // Cheque copyWith({
   //   int? chequeNo,
   //   double? amount,
   //   String? drawer,
@@ -80,9 +87,3 @@ class Cheque {
   //       dueDate ?? this.dueDate,
   //       chequeImageUri ?? this.chequeImageUri);
   // }
-
-  @override
-  String toString() {
-    return 'Cheque No: $chequeNo, Amount: $amount, Drawer: $drawer, Bank: $bankName, Status: $status, Received Date: $receivedDate, Due Date: $dueDate, Cheque Image: $chequeImageUri, Return Reason: $returnReason, Cashed Date: $cashedDate';
-  }
-}

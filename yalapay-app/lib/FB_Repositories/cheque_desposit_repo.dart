@@ -7,9 +7,17 @@ import '../models/bank_account.dart';
 import '../models/cheque_deposit.dart';
 
 class ChequeDespositRepo {
-  final CollectionReference chequedepositRef;
-  ChequeDespositRepo({required this.chequedepositRef});
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  late final CollectionReference chequedepositRef;
+
+  ChequeDespositRepo() {
+    chequedepositRef = _db.collection('ChequeDeposits'); }
+
   List<BankAccount> _bankAccounts = [];
+  List<ChequeDeposit> get chequeDeposits => chequeDeposits;
+  set chequeDeposits(List<ChequeDeposit> chequeDeposits) =>
+      chequeDeposits = chequeDeposits;
+
   Stream<List<ChequeDeposit>> observeChequeDeposits() {
     return chequedepositRef.snapshots().map((snapshot) {
       return snapshot.docs
@@ -17,6 +25,31 @@ class ChequeDespositRepo {
               ChequeDeposit.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     });
+  }
+
+  Future<List<ChequeDeposit>> initChequeDeposits() async {
+    List<ChequeDeposit> chequeDeposits = [];
+    final snapshot = await chequedepositRef.get();
+    if (snapshot.docs.isEmpty) {
+      var chequeDepositData =
+          await rootBundle.loadString('assets/data/cheque-deposits.json');
+      var chequeDepositsMap = jsonDecode(chequeDepositData);
+      chequeDeposits = chequeDepositsMap
+          .map<ChequeDeposit>(
+              (chequeDeposit) => ChequeDeposit.fromJson(chequeDeposit))
+          .toList();
+      for (var chequeDeposit in chequeDeposits) {
+        await chequedepositRef
+            .doc(chequeDeposit.id.toString())
+            .set(chequeDeposit.toJson());
+      }
+    } else {
+      chequeDeposits = snapshot.docs
+          .map((doc) =>
+              ChequeDeposit.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    }
+    return chequeDeposits;
   }
 
   Future<List<BankAccount>> initBankAccounts() async {
@@ -30,24 +63,59 @@ class ChequeDespositRepo {
     return _bankAccounts;
   }
 
-   get bankAccounts => _bankAccounts;
+  get bankAccounts => _bankAccounts;
 
-   Future< ChequeDeposit?> getChequeDepositById(int id)async {
-    return null;
-  }
+  Future<ChequeDeposit?> getChequeDepositById(int id) async =>
+      chequedepositRef.doc(id as String?).get().then((snapshot) {
+        return ChequeDeposit.fromJson(snapshot.data() as Map<String, dynamic>);
+      });
 
   Future<List<ChequeDeposit>> searchChequeDeposits(String text) async {
     return [];
   }
 
+  Future<void> addChequeDeposit(ChequeDeposit chequeDeposit) async {
+    var docId = chequedepositRef.doc().id;
+    chequeDeposit.id = int.parse(docId);
+    await chequedepositRef.doc(docId).set(chequeDeposit.toJson());
+  }
 
- Future<void > addChequeDeposit(ChequeDeposit chequeDeposit) async{ }
+  Future<void> deleteChequeDeposit(ChequeDeposit chequeDeposit) async {
+    final chequeDoc =
+        await chequedepositRef.doc(chequeDeposit.id.toString()).get();
+    if (chequeDoc.exists) {
+      chequedepositRef.doc(chequeDeposit.id.toString()).delete();
+    }
+  }
 
- Future<void > deleteChequeDeposit(ChequeDeposit chequeDeposit) async{ }
+  Future<void> updateChequeDeposit(ChequeDeposit chequeDeposit) async {
+    String? newchequeDepositId = chequeDeposit.id.toString();
+    chequedepositRef.doc(newchequeDepositId).update(chequeDeposit.toJson());
+  }
 
-Future<void > updateChequeDeposit(ChequeDeposit chequeDeposit) async{ }
+  Future<void> updateChequeDepositOnChequeDelete(int chequeNo) async {
+    final querySnapshot = await chequedepositRef.get();
+    List<ChequeDeposit> temp = [];
+    for (var doc in querySnapshot.docs) {
+      final chequeDeposit =
+          ChequeDeposit.fromJson(doc.data() as Map<String, dynamic>);
 
-Future<void > updateChequeDepositOnChequeDelete(int chequeNo) async{ }
+      if (chequeDeposit.chequeNos.contains(chequeNo)) {
+        chequeDeposit.chequeNos.remove(chequeNo);
+        if (chequeDeposit.chequeNos.isEmpty) {
+          temp.add(chequeDeposit);
+        }
+        await chequedepositRef.doc(doc.id).update({
+          'chequeNos': chequeDeposit.chequeNos,
+        });
+      }
+    }
 
-
+    for (var chequeDeposit in temp) {
+      final docToDelete = querySnapshot.docs.firstWhere((doc) =>
+          ChequeDeposit.fromJson(doc.data() as Map<String, dynamic>) ==
+          chequeDeposit);
+      await chequedepositRef.doc(docToDelete.id).delete();
+    }
+  }
 }

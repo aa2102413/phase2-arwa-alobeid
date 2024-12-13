@@ -9,4 +9,3 @@ class SelectedChequesProvider extends Notifier<List<Cheque>> {
 }
 
 final selectedChequeProviderNotifier = NotifierProvider<SelectedChequesProvider, List<Cheque>>(() => SelectedChequesProvider());
-//final selectedProjectIdProvider = StateProvider<String?>((ref) => null);

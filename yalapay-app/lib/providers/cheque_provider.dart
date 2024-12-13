@@ -38,6 +38,7 @@ class ChequeProvider extends Notifier<List<Cheque>> {
   List<Cheque> filterList(String status){
     return List.from(_appRepository.filterList(status));
   }
+ 
 
   void deleteCheque(Cheque cheque) {
     _appRepository.deleteCheque(cheque);

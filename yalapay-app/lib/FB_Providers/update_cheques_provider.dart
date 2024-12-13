@@ -1,17 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yalapay/models/cheque.dart';
 
-class UpdatedChequesProvider extends Notifier<List<Cheque>> {
-  @override
-  List<Cheque> build() {
+import '../FB_Repositories/cheque_repo.dart';
+
+class UpdatedChequesNotifier extends StateNotifier<List<Cheque>> {
+ UpdatedChequesNotifier() : super(const []);
+  late final ChequeRepo _chequeRepo;
+
+  Future<List<Cheque>> build() async{
+   _chequeRepo.observeCheques().listen((cheques) {
+      state = cheques;
+    }).onError((error) {
+      print(error);
+    });
     return [];
   }
 
   void addCheque(Cheque cheque) {
-    state = [...state, cheque];
+   _chequeRepo.addCheque(cheque);
   }
 
-  void updateChequeStatusAndCashedDate(Cheque cheque, String status, DateTime cashedDate, String returnReason) {
+ void updateChequeStatusAndCashedDate(Cheque cheque, String status, DateTime cashedDate, String returnReason) {
     state = state.map((element) {
       if (element.chequeNo == cheque.chequeNo) {
         return Cheque(
@@ -31,8 +40,9 @@ class UpdatedChequesProvider extends Notifier<List<Cheque>> {
     }).toList();
   }
 
-  bool chequeExists(Cheque cheque) {
-    return state.any((element) => element.chequeNo == cheque.chequeNo);
-  }
+
 }
-final updatedChequesProviderNotifier = NotifierProvider<UpdatedChequesProvider, List<Cheque>>(() => UpdatedChequesProvider());
+
+final updatedChequesProviderNotifier =
+    StateNotifierProvider<UpdatedChequesNotifier, List<Cheque>>(
+        (ref) => UpdatedChequesNotifier());

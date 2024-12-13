@@ -78,11 +78,9 @@ set payments(List<Payment> payments) => payments = payments;
   Future<List<Payment>> searchPayments(String text, List<Cheque> cheques)async {
     final isInteger = int.tryParse(text) != null;
     final querySnapshot = await paymentRef.get();
-    final payments = querySnapshot.docs.map((doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      return Payment.fromJson(data);
-    }).toList();
-
+    final payments = querySnapshot.docs.map((doc) =>Payment.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      
+ 
     return payments.where((payment) {
     bool matchesId = isInteger && payment.id == int.parse(text);
 
@@ -94,19 +92,14 @@ set payments(List<Payment> payments) => payments = payments;
 
     if (payment.chequeNo > 0) {
       Cheque? cheque = cheques.firstWhere(
-        (cheque) => cheque.chequeNo == payment.chequeNo,
-        orElse: () => null,
-      );
+        (cheque) => cheque.chequeNo == payment.chequeNo );
       if (cheque != null) {
         matchesChequeStatus = cheque.status.toLowerCase().contains(text.toLowerCase());
       }
     }
 
     if (payment.paymentMode.toLowerCase() == 'cheque') {
-      Cheque? cheque = cheques.firstWhere(
-        (cheque) => cheque.chequeNo == payment.chequeNo,
-        orElse: () => null,
-      );
+      Cheque? cheque = cheques.firstWhere((cheque) => cheque.chequeNo == payment.chequeNo);
       if (cheque != null) {
         matchChequeDetails = cheque.containsText(text.toLowerCase());
       }
@@ -115,31 +108,7 @@ set payments(List<Payment> payments) => payments = payments;
     return matchesId || matchesContent || matchesChequeStatus || matchChequeDetails;
   }).toList();
   }
-  /**List<Payment> searchPayments(String text, List<Cheque> cheques) {
-    final isInteger = int.tryParse(text) != null;
-
-    return payments.where((payment) {
-      bool matchesId = isInteger && payment.id == int.parse(text);
-
-      bool matchesContent = payment.containsText(text.toLowerCase());
-
-      bool matchesChequeStatus = false;
-
-      bool matchChequeDetails = false;
-
-      if (payment.chequeNo > 0) {
-        Cheque? cheque = cheques.firstWhere((cheque) => cheque.chequeNo == payment.chequeNo);
-        matchesChequeStatus = cheque.status.toLowerCase().contains(text.toLowerCase());
-      }
-
-      if(payment.paymentMode.toLowerCase() == 'cheque'){
-        Cheque? cheque = cheques.firstWhere((cheque) => cheque.chequeNo == payment.chequeNo);
-        matchChequeDetails = cheque.containsText(text.toLowerCase());
-      }
-
-      return matchesId || matchesContent || matchesChequeStatus || matchChequeDetails;
-    }).toList();
-  } */
+ 
 
   Future<void> addPayment(Payment payment) async {
 

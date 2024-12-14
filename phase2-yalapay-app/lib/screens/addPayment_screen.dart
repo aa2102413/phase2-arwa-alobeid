@@ -1,8 +1,13 @@
 // import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:yalapay/data_classes/payment_args.dart';
 import 'package:yalapay/models/cheque.dart';
 import 'package:yalapay/models/cheque_deposit.dart';
@@ -35,6 +40,9 @@ class AddPaymentScreen extends ConsumerStatefulWidget {
 }
 
 class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen>{
+    File? _imageFile;
+  bool _isUploading = false;
+
   bool update = false;
   late int selectedOption=0;
 
@@ -111,6 +119,71 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen>{
       }
     });
   }
+  Future<void> pickImage(ImageSource source) async {
+    try {
+      if (Platform.isAndroid) {
+        await requestPermission();
+      }
+
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: source);
+      if (image != null) {
+        setState(() {
+          _imageFile = File(image.path);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
+    }
+  }
+
+  Future<void> uploadImage() async {
+    if (_imageFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an image first.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isUploading = true;
+    });
+
+    try {
+      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final path = '/$fileName';
+
+      var uploadPath = await Supabase.instance.client.storage
+          .from('images')  .upload(path, _imageFile!);
+
+      final publicUrl = Supabase.instance.client.storage.from('images')
+          .getPublicUrl(uploadPath);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image uploaded successfully! URL: $publicUrl')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error uploading image: ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
+    }
+  }
+
+  Future<void> requestPermission() async {
+    if (Platform.isAndroid) {
+      if (await Permission.photos.isDenied ||
+          await Permission.photos.isPermanentlyDenied) {
+        await Permission.photos.request();
+      }
+    }
+  }
+
 
   // TODO: On Phase 2 upload image to firebase storage
   // Future<void> pickImage() async {
@@ -431,34 +504,75 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen>{
                                 style: TextStyle(color: Colors.black, fontSize: 14,fontWeight: FontWeight.bold,),
                               ),
 
-                              //TODO: On Phase 2 upload image to firebase storage
-                              // Expanded(
-                              //   child: GestureDetector(
-                              //     onTap: pickImage,
-                              //     child: Container(
-                              //       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-                              //       decoration: BoxDecoration(
-                              //         color: Colors.white,
-                              //         borderRadius: BorderRadius.circular(4),
-                              //       ),
-                              //       child: Text(
-                              //         imagePath ?? 'Select an image',
-                              //         style: TextStyle(
-                              //           color: imagePath != null ? Colors.black : Colors.grey,
-                              //         ),
-                              //         overflow: TextOverflow.ellipsis,
-                              //       ),
-                              //     )
-                              //   ),
-                              // ),
-                              // IconButton(
-                              //   icon: const Icon(Icons.camera_alt_outlined),
-                              //   onPressed: pickImage,
-                              // ),
-
-                              //A DIFFERENT APPROACH
+                           
                             ],
                           ),
+                          Column(children: [
+
+                             DropdownButton <String> (
+                                hint: const Text('Select a cheque'),
+                                isExpanded: true,
+                                value: selectedCheque,
+                                items: chequeImages.map((e) => DropdownMenuItem(
+                                  value: e.image.toString(),
+                                  child: Row(
+                                    children: [
+                                      Text(' cheque${(e.id-100)+1}.jpg |'),
+                                      const SizedBox(width: 10,),
+                                      Image.asset(
+                                          'assets/cheques/${e.image}',
+                                          width: 100,
+                                          height: 40,
+                                          fit: BoxFit.cover,
+                                        ),
+                                    ],
+                                    ),
+                                )).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedCheque = value;
+                                  });
+                                },
+                              ), 
+                              SizedBox(height: 5,),  
+                   Row(children: [
+                         MaterialButton(
+              color: Colors.lightBlue,
+              onPressed: () => pickImage(ImageSource.camera),
+              child: const Text('From Camera'),
+            ),
+
+
+             MaterialButton(
+              color: Colors.lightBlue,
+              onPressed: () => pickImage(ImageSource.gallery),
+              child: const Text('From Gallery'),
+            ),
+
+             Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(color: Colors.grey[200]),
+              child: _imageFile != null
+                  ? Image.file(
+                      _imageFile!,
+                      width: 200.0,
+                      height: 200.0,
+                      fit: BoxFit.fitHeight,
+                    )
+                  : const Text("Pick an image from gallery or camera"),
+            ),
+
+              ElevatedButton(
+              onPressed: _isUploading ? null : uploadImage,
+              child: _isUploading
+                  ? const CircularProgressIndicator()
+                  : const Text('Upload Image'),
+            ),
+
+                   ],)
+
+                          ],),
                           DropdownButton <String> (
                                 hint: const Text('Select a cheque'),
                                 isExpanded: true,

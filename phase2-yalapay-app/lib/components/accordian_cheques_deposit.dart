@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:yalapay/FB_Providers/cheque_deposit_provider.dart';
 import 'package:yalapay/FB_Providers/cheque_provider.dart';
 import 'package:yalapay/FB_Providers/update_cheques_provider.dart';
@@ -22,10 +23,19 @@ class AccordianChequesDeposit extends ConsumerStatefulWidget {
 
 class _AccordianChequesDepositState
     extends ConsumerState<AccordianChequesDeposit> {
+    final SupabaseClient _supabaseClient = Supabase.instance.client;
+  List<String> _imageUrls = [];
+  List<String> _imageNames = [];
   bool isIconUp = false;
   List<Cheque> selectedCheques = [];
   double amountPaid = 0.0;
   double amountDue = 0.0;
+
+ @override
+  void initState() {
+    super.initState();
+    _loadImages();
+  }
   Future<void> _fetchChequeDetails() async {
     final readChequeNotifier = ref.watch(chequeNotifierProvider.notifier);
     selectedCheques.clear();
@@ -33,10 +43,7 @@ class _AccordianChequesDepositState
     amountDue = 0;
 
     for (var cheque in widget.chequeDeposit.chequeNos) {
-      // Await the Future to get the actual cheque data
       final chequeData = await readChequeNotifier.getChequeById(cheque);
-
-      // Check if the chequeData is null (if the cheque wasn't found)
       if (chequeData == null) continue;
 
       if (selectedCheques.contains(chequeData)) continue;
@@ -48,9 +55,40 @@ class _AccordianChequesDepositState
     }
   }
 
+   Future<void> _loadImages() async {
+    try {
+      final files = await _supabaseClient.storage.from('images').list();
+      final List<String> urls = files
+          .map((file) =>
+              _supabaseClient.storage.from('images').getPublicUrl(file.name))
+          .toList();
+      final List<String> names = files.map((file) => file.name).toList();
+      setState(() {
+        _imageUrls = urls;
+        _imageNames = names;
+      });
+    } catch (e) {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading images: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _deleteImage(int index) async {
+    try { await _supabaseClient.storage.from('images').remove([_imageNames[index]]);
+      setState(() {
+        _imageUrls.removeAt(index);
+        _imageNames.removeAt(index); });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Image deleted successfully')),
+      ); } catch (e) {ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting image: ${e.toString()}')),
+      );}}
+
+
   @override
   Widget build(BuildContext context) {
-    //final readChequeNotifier = ref.watch(chequeNotifierProvider.notifier);
     final readChequeDepositNotifier = ref.read(chequeDepositProvider.notifier);
     final readUpdatedChequesProvider =
         ref.watch(updatedChequesProviderNotifier.notifier);
@@ -469,6 +507,7 @@ class _AccordianChequesDepositState
                                                   readChequeDepositNotifier
                                                       .deleteChequeDeposit(
                                                           widget.chequeDeposit);
+                                                          
 
                                                   Navigator.of(context).pop();
                                                 },

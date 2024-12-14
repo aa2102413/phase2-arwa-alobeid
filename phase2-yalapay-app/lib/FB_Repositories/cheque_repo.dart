@@ -7,7 +7,6 @@ import '../models/cheque.dart';
 class ChequeRepo {
   late final FirebaseFirestore _db = FirebaseFirestore.instance;
   late final CollectionReference chequeRef;
-
   ChequeRepo() {
     chequeRef=_db.collection('cheques'); }
 
@@ -29,26 +28,15 @@ class ChequeRepo {
       var chequeData = await rootBundle.loadString('assets/data/cheques.json');
       var chequesMap = jsonDecode(chequeData);
 
-      cheques =
-          chequesMap.map<Cheque>((cheque) => Cheque.fromJson(cheque)).toList();
+      cheques = chequesMap.map<Cheque>((cheque) => Cheque.fromJson(cheque)).toList();
       for (var cheque in cheques) {
         await chequeRef.doc(cheque.chequeNo.toString()).set(cheque.toJson());
       }
-    } 
-    // else {
-    //   // Load from Firestore
-    //   cheques = snapshot.docs
-    //       .map((doc) => Cheque.fromJson(doc.data() as Map<String, dynamic>))
-    //       .toList();
-    // }
-
-    return cheques;
-  }
+    }return cheques; }
 
   Future<Cheque?> getChequeBychequeNo(String chequeNo) =>
       chequeRef.doc(chequeNo).get().then((snapshot) {
-        return Cheque.fromJson(snapshot.data() as Map<String, dynamic>);
-      });
+        return Cheque.fromJson(snapshot.data() as Map<String, dynamic>); });
 
   Future<void> addCheque(Cheque cheque) async {
     var docId = chequeRef.doc().id;

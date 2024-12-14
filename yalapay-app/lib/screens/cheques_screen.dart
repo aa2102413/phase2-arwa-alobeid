@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yalapay/components/accordian_cheques.dart';
 import 'package:yalapay/models/cheque.dart';
-import 'package:yalapay/providers/cheque_provider.dart';
 import 'package:yalapay/providers/login_provider.dart';
 import 'package:yalapay/routes/app_router.dart';
+
+import '../FB_Providers/cheque_provider.dart';
 
 class ChequesScreen extends ConsumerStatefulWidget {
   final List<Cheque>? cheques;
@@ -23,6 +24,7 @@ class _ChequeScreenState extends ConsumerState<ChequesScreen> {
 
   @override
   void initState() {
+     ref.read(chequeNotifierProvider.notifier).initalizeState();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final bool logged = await ref.read(loginProviderNotifier.notifier).isLoggedIn();
@@ -54,9 +56,11 @@ class _ChequeScreenState extends ConsumerState<ChequesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final awaitingCheques = ref.read(chequeProviderNotifier.notifier).filterList('Awaiting');
+   // final awaitingCheques = ref.read(chequeProviderNotifier.notifier).filterList('Awaiting');
     final router = GoRouter.of(context);
-
+    final cheques = ref.watch(chequeNotifierProvider);
+final awaitingCheques =
+        cheques.where((cheque) => cheque.status == 'Awaiting').toList();
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -106,3 +110,5 @@ class _ChequeScreenState extends ConsumerState<ChequesScreen> {
     );
   }
 }
+/**  return AccordionCheques(
+                      cheque: awaitingCheques[index], isExpanded: true); */

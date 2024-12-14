@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yalapay/FB_Providers/cheque_provider.dart';
+import 'package:yalapay/FB_Providers/invoice_provider.dart';
+import 'package:yalapay/FB_Providers/payment_provider.dart';
 import 'package:yalapay/components/accordian_payments.dart';
 import 'package:yalapay/data_classes/payment_args.dart';
-import 'package:yalapay/models/cheque.dart';
 import 'package:yalapay/models/payment.dart';
-import 'package:yalapay/providers/cheque_provider.dart';
-import 'package:yalapay/providers/invoice_provider.dart';
 import 'package:yalapay/providers/login_provider.dart';
-import 'package:yalapay/providers/payment_provider.dart';
 import 'package:yalapay/routes/app_router.dart';
 
 class PaymentsScreen extends ConsumerStatefulWidget {
@@ -27,6 +26,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
   @override
   void initState() {
     super.initState();
+    ref.read(paymentNotifierProvider.notifier).initalizeState();
+     ref.read(invoiceNotifierProvider.notifier).initalizeState();
+      ref.read(chequeNotifierProvider.notifier).initalizeState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final bool logged = await ref.read(loginProviderNotifier.notifier).isLoggedIn();
 
@@ -50,23 +53,25 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final readPaymentNotifier = ref.read(paymentProviderNotifier.notifier);
-    final watchPayment = ref.watch(paymentProviderNotifier);
-    final readInvoiceNotifier = ref.read(invoiceProviderNotifier.notifier);
-    final readChequeNotifier = ref.read(chequeProviderNotifier.notifier);
-
-    payments = widget.isInvoice ? readPaymentNotifier.paymentState(widget.invoiceId!) : watchPayment;
+   final readPaymentNotifier = ref.read(paymentNotifierProvider.notifier);
+    final watchPayment = ref.watch(paymentNotifierProvider);
+   final readInvoiceNotifier = ref.watch(invoiceNotifierProvider.notifier);
+    final readChequeNotifier = ref.watch(chequeNotifierProvider.notifier);
+    payments= widget.isInvoice 
+        ? watchPayment.where((payment) => payment.invoiceNo == widget.invoiceId).toList()
+        : watchPayment;
     final isWideScreen = MediaQuery.of(context).size.width >= 860;
     final router = GoRouter.of(context);
 
     if(widget.isInvoice){
-      amountDue = readInvoiceNotifier.getInvoiceById(widget.invoiceId!).amount;
+      final invoice = readInvoiceNotifier.state.firstWhere((invoice) => invoice.id == widget.invoiceId);
+      amountDue = invoice.amount;
+
       for(var p in watchPayment){
         if(p.invoiceNo == widget.invoiceId!){
           if(p.chequeNo > 0){
-            Cheque temp = readChequeNotifier.getChequeById(p.chequeNo);
-            
-            if(temp.status != 'Returned'){
+             final temp = readChequeNotifier.state.firstWhere((cheque) => cheque.chequeNo== p.chequeNo,);
+            if (temp.status != 'Returned') {
               amountDue -= p.amount;
             }
 
@@ -90,7 +95,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
               child: TextField(
                 onChanged: (text) {
                   setState(() {
-                    readPaymentNotifier.searchPayments(text);
+                     readPaymentNotifier.searchPayments(text);
                   });
                 },
                 keyboardType: TextInputType.number,

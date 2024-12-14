@@ -6,6 +6,7 @@ class SelectedChequesProvider extends Notifier<List<Cheque>> {
   List<Cheque> build() {
     return [];
   }
+  
 }
 
 final selectedChequeProviderNotifier = NotifierProvider<SelectedChequesProvider, List<Cheque>>(() => SelectedChequesProvider());

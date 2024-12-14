@@ -7,15 +7,7 @@ class PaymentNotifier extends StateNotifier<List<Payment>> {
   PaymentNotifier() : super(const []);
   late final PaymentRepo _paymentRepo;
 
-  // @override
-  // Future<List<Payment>> build() async {
-  //   _paymentRepo = await ref.watch(paymentRepoProvider.future);
-  //   _paymentRepo.observePayments().listen((payments) {
-  //     state = AsyncValue.data(payments);
-  //   }).onError((error) {
-  //     print(error);
-  //   });
-  //  return []; }
+  
 
   Future<List<Payment>> build() async {
    await  _paymentRepo.initBanks();  _paymentRepo.initBanks(); 
@@ -76,3 +68,14 @@ void deletePayment(Payment payment) async{
 final paymentNotifierProvider =
    StateNotifierProvider<PaymentNotifier, List<Payment>>(
        (ref) => PaymentNotifier());
+
+
+       // @override
+  // Future<List<Payment>> build() async {
+  //   _paymentRepo = await ref.watch(paymentRepoProvider.future);
+  //   _paymentRepo.observePayments().listen((payments) {
+  //     state = AsyncValue.data(payments);
+  //   }).onError((error) {
+  //     print(error);
+  //   });
+  //  return []; }

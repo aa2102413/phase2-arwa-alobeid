@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yalapay/FB_Providers/cheque_deposit_provider.dart';
+import 'package:yalapay/FB_Providers/selected_cheque_provider.dart';
 import 'package:yalapay/components/accordian_cheques_deposit.dart';
 import 'package:yalapay/data_classes/cheque_deposit_args.dart';
-import 'package:yalapay/providers/cheque_deposit_provider.dart';
-import 'package:yalapay/providers/cheque_provider.dart';
 import 'package:yalapay/providers/login_provider.dart';
-import 'package:yalapay/providers/selected_cheques_provider.dart';
+
 import 'package:yalapay/routes/app_router.dart';
 
 
@@ -38,18 +38,26 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
 
 
   @override
   Widget build(BuildContext context) {
-    ref.read(chequeProviderNotifier);
-    final watchChequeDeposits = ref.watch(chequeDepositProviderNotifier);
-    final readChequeDepositsNotifier = ref.read(chequeDepositProviderNotifier.notifier);
-    final readSelectedCheque = ref.read(selectedChequeProviderNotifier);
+    // ref.read(chequeProviderNotifier);
+    // final watchChequeDeposits = ref.watch(chequeDepositProviderNotifier);
+    // final readChequeDepositsNotifier = ref.read(chequeDepositProviderNotifier.notifier);
+    // final readSelectedCheque = ref.read(selectedChequeProviderNotifier);
+
+     final watchChequeDeposits = ref.watch(chequeDepositProvider);
+    final chequeDepositsNotifier = ref.read(chequeDepositProvider.notifier);
+    final selectedChequesNotifier = ref.read(selectedChequeProviderNotifier.notifier);
+
+    // final selectedCheques = ref.watch(selectedChequeProviderNotifier);
+    // final cheques = ref.watch(chequeNotifierProvider);
+    // final chequeNotifier = ref.read(chequeNotifierProvider.notifier);
 
     final isWideScreen = MediaQuery.of(context).size.width >= 860;
     final router = GoRouter.of(context);
@@ -58,6 +66,7 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
       backgroundColor: Colors.white,
       body: Column(
           children: [
+            //remove dots
             if(!isWideScreen) ...[Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: SizedBox(
@@ -65,9 +74,10 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
                 width: 350,
                 child: TextField(
                   onChanged: (text) {
-                    setState(() {
-                      readChequeDepositsNotifier.searchChequeDeposits(text);
-                    });
+                    // setState(() {
+                    //   readChequeDepositsNotifier.searchChequeDeposits(text);
+                    // });
+                      chequeDepositsNotifier.searchChequeDeposits(text);
                   },
                   decoration: InputDecoration(
                     hintText: 'Hinted Search Text',
@@ -98,9 +108,10 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
                 width: 350,
                 child: TextField(
                   onChanged: (text) {
-                    setState(() {
-                      readChequeDepositsNotifier.searchChequeDeposits(text);
-                    });
+                    // setState(() {
+                    //   readChequeDepositsNotifier.searchChequeDeposits(text);
+                    // });
+                    chequeDepositsNotifier.searchChequeDeposits(text);
                   },
                   decoration: InputDecoration(
                     hintText: 'Hinted Search Text',
@@ -114,8 +125,11 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
             ),],
                   Row(
                     children: [
-                      IconButton(icon: const Icon(Icons.add_circle), onPressed: () {
-                        readSelectedCheque.clear();
+                      IconButton(icon: const Icon(Icons.add_circle),
+                       onPressed: () {
+                       // readSelectedCheque.clear();
+                        //selectedChequesNotifier.state = [];
+                          selectedChequesNotifier.clearCheques();
                         router.go(
                           '${AppRouter.chequeDeposit.path}${AppRouter.addChequeDeposit.path}', 
                           extra: ChequeDepositArgs(isAdd: true));

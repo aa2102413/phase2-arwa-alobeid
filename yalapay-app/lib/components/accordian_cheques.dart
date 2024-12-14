@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yalapay/models/cheque.dart';
 import 'package:yalapay/models/simpleDate.dart';
 import 'package:yalapay/providers/cheque_provider.dart';
-import 'package:yalapay/providers/selected_cheques_provider.dart';
+
+import '../FB_Providers/selected_cheque_provider.dart';
+
 
 class AccordianCheques extends ConsumerStatefulWidget {
   final Cheque cheque;
@@ -57,15 +59,33 @@ class _AccordianChequesState extends ConsumerState<AccordianCheques> {
 
   @override
   Widget build(BuildContext context) {
-    overDue();
+     overDue();
+    //   final selectedCheques = ref.watch(selectedChequeProviderNotifier);
+    // final chequeNotifier = ref.read(chequeProviderNotifier.notifier);
+    // var isChecked = selectedCheques.contains(cheque);
+    // final isOverDue = cheque.receivedDate.isBefore(cheque.dueDate);
+
     final watchSelectedChequeProvider = ref.watch(selectedChequeProviderNotifier);
-    final readChequeNotifier = ref.read(chequeProviderNotifier.notifier);
+    final readChequeNotifier = ref.watch(chequeProviderNotifier.notifier);
 
     for (var cheque in watchSelectedChequeProvider) {
       if (cheque.chequeNo == widget.cheque.chequeNo) {
         isChecked = true;
       }
     }
+
+
+  //   void toggleCheck() {
+  //     if (isChecked) {
+  //       // ref.read(selectedChequeProviderNotifier.notifier).removeCheque(cheque);
+          
+  //     isChecked = !isChecked;
+  // }
+  // // else {
+  // //       ref.read(selectedChequeProviderNotifier.notifier).addCheque(cheque);
+  // //     }
+  //   }
+
 
     return GestureDetector(
       onTap: () {
@@ -88,7 +108,7 @@ class _AccordianChequesState extends ConsumerState<AccordianCheques> {
                     child: Row( 
                       mainAxisAlignment: MainAxisAlignment.start,
                        children: [
-                        widget.isAdd? IconButton(
+                         widget.isAdd? IconButton(
                           icon: Icon(
                             isChecked ? Icons.check_box : Icons.check_box_outline_blank,
                             color: isChecked ? Colors.green : Colors.grey,
@@ -119,7 +139,6 @@ class _AccordianChequesState extends ConsumerState<AccordianCheques> {
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                   ),
-
                   isOverDue ? Flexible(
                     flex: 3,
                     child: 
@@ -135,7 +154,7 @@ class _AccordianChequesState extends ConsumerState<AccordianCheques> {
                       ),
                     ) ,
                   ): Container(),
-    
+
                    Flexible(
                     flex: 3,
                      child: Row(  

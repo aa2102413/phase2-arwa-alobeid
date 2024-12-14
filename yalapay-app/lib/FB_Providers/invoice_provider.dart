@@ -12,14 +12,7 @@ class InvoiceNotifier extends StateNotifier<List<Invoice>> {
   InvoiceNotifier() : super(const []);
   late final InvoiceRepo _invoiceRepo;
 
-  // Future<List<Invoice>> build() async {
-  //   _invoiceRepo.observeInvoices().listen((invoices) {
-  //     state =invoices;
-  //   }).onError((error) {
-  //     print(error);
-  //   });
-  //   return [];
-  // }
+
 
   List<Invoice> build() {
     initalizeState();

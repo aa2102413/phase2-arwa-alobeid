@@ -27,13 +27,14 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
   void initState() {
     super.initState();
     ref.read(paymentNotifierProvider.notifier).initalizeState();
-     ref.read(invoiceNotifierProvider.notifier).initalizeState();
-      ref.read(chequeNotifierProvider.notifier).initalizeState();
+    ref.read(invoiceNotifierProvider.notifier).initalizeState();
+    ref.read(chequeNotifierProvider.notifier).initalizeState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final bool logged = await ref.read(loginProviderNotifier.notifier).isLoggedIn();
+      final bool logged =
+          await ref.read(loginProviderNotifier.notifier).isLoggedIn();
 
-      if(!logged){
+      if (!logged) {
         GoRouter.of(context).go(AppRouter.error.path);
       }
     });
@@ -53,131 +54,154 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-   final readPaymentNotifier = ref.read(paymentNotifierProvider.notifier);
+    final readPaymentNotifier = ref.read(paymentNotifierProvider.notifier);
     final watchPayment = ref.watch(paymentNotifierProvider);
-   final readInvoiceNotifier = ref.watch(invoiceNotifierProvider.notifier);
-    final readChequeNotifier = ref.watch(chequeNotifierProvider.notifier);
-    payments= widget.isInvoice 
-        ? watchPayment.where((payment) => payment.invoiceNo == widget.invoiceId).toList()
+    final watchInvoiceNotifier = ref.watch(invoiceNotifierProvider);
+     final watchChequeNotifier = ref.watch(chequeNotifierProvider);
+    payments = widget.isInvoice
+        ? watchPayment
+            .where((payment) => payment.invoiceNo == widget.invoiceId)
+            .toList()
         : watchPayment;
     final isWideScreen = MediaQuery.of(context).size.width >= 860;
     final router = GoRouter.of(context);
 
-    if(widget.isInvoice){
-      final invoice = readInvoiceNotifier.state.firstWhere((invoice) => invoice.id == widget.invoiceId);
+    if (widget.isInvoice) {
+      final invoice =  watchInvoiceNotifier.firstWhere((i) => i.id == widget.invoiceId);;
       amountDue = invoice.amount;
-
-      for(var p in watchPayment){
-        if(p.invoiceNo == widget.invoiceId!){
-          if(p.chequeNo > 0){
-             final temp = readChequeNotifier.state.firstWhere((cheque) => cheque.chequeNo== p.chequeNo,);
+      for (var p in watchPayment) {
+        if (p.invoiceNo == widget.invoiceId!) {
+          if (p.chequeNo > 0) {
+            final temp = watchChequeNotifier.firstWhere(
+              (cheque) => cheque.chequeNo == p.chequeNo,
+            );
             if (temp.status != 'Returned') {
               amountDue -= p.amount;
             }
-
-          }
-          else{
+          } else {
             amountDue -= p.amount;
-          }    
+          }
         }
       }
     }
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
+      body: 
+      Column(
         children: [
-          if(!isWideScreen && !widget.isInvoice) ...[Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: SizedBox(
-              height: 40,
-              width: 350,
-              child: TextField(
-                onChanged: (text) {
-                  setState(() {
-                     readPaymentNotifier.searchPayments(text);
-                  });
-                },
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'Hinted Search Text',
-                  suffixIcon: IconButton(onPressed: () {  },icon: const Icon(Icons.search),),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(40.0),
+          if (!isWideScreen && !widget.isInvoice) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: SizedBox(
+                height: 40,
+                width: 350,
+                child: TextField(
+                  onChanged: (text) {
+                    setState(() {
+                      readPaymentNotifier.searchPayments(text);
+                    });
+                  },
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: 'Hinted Search Text',
+                    suffixIcon: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.search),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),],
+          ],
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                
-                widget.isInvoice ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                  IconButton(
-                  onPressed: () { 
-                    router.pop();
-                    }, 
-                    icon: const Icon(Icons.arrow_back)),
-                    SizedBox(width: 20,),
-                    const Text(
-                    'Payments.',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],) : const Text(
-                    'Payments.',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
-                ),
-
-                if(isWideScreen && !widget.isInvoice) ...[Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: SizedBox(
-                    height: 40,
-                    width: 350,
-                    child: TextField(
-                      onChanged: (text) {
-                        setState(() {
-                          readPaymentNotifier.searchPayments(text);
-                        });
-                      },
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        hintText: 'Hinted Search Text',
-                        suffixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(40.0),
+                widget.isInvoice
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                router.pop();
+                              },
+                              icon: const Icon(Icons.arrow_back)),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          const Text(
+                            'Payments.',
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      )
+                    : const Text(
+                        'Payments.',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                if (isWideScreen && !widget.isInvoice) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: SizedBox(
+                      height: 40,
+                      width: 350,
+                      child: TextField(
+                        onChanged: (text) {
+                          setState(() {
+                            readPaymentNotifier.searchPayments(text);
+                          });
+                        },
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: 'Hinted Search Text',
+                          suffixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(40.0),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),],
+                ],
                 Row(
                   children: [
-                    IconButton(onPressed: () {
-                      if(!widget.isInvoice) {
-                        router.go('${AppRouter.payments.path}${AppRouter.addPayment.path}', extra: PaymentArgs(isAdd: true, isInvoice: widget.isInvoice, invoiceId: 0));
-                      }
-                      else{
-                        if(amountDue <= 0){
-                          showNotification('Invoice is fully paid.');
-                          return;
-                        }
-                        else{
-                          router.go('${AppRouter.invoice.path}${AppRouter.paymentsFromInvoice.path}${AppRouter.addPaymentFromInvoice.path}', extra: PaymentArgs(isAdd: true, isInvoice: widget.isInvoice, invoiceNo: widget.invoiceId, invoiceId: widget.invoiceId!));
-                        }
-                      }
-                    },
-                    icon: const Icon(Icons.add_circle)),
+                    IconButton(
+                        onPressed: () {
+                          if (!widget.isInvoice) {
+                            router.go(
+                                '${AppRouter.payments.path}${AppRouter.addPayment.path}',
+                                extra: PaymentArgs(
+                                    isAdd: true,
+                                    isInvoice: widget.isInvoice,
+                                    invoiceId: 0));
+                          } else {
+                            if (amountDue <= 0) {
+                              showNotification('Invoice is fully paid.');
+                              return;
+                            } else {
+                              router.go(
+                                  '${AppRouter.invoice.path}${AppRouter.paymentsFromInvoice.path}${AppRouter.addPaymentFromInvoice.path}',
+                                  extra: PaymentArgs(
+                                      isAdd: true,
+                                      isInvoice: widget.isInvoice,
+                                      invoiceNo: widget.invoiceId,
+                                      invoiceId: widget.invoiceId!));
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.add_circle)),
                   ],
                 ),
               ],
@@ -193,13 +217,17 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
               child: ListView.builder(
                 itemCount: payments!.length,
                 itemBuilder: (context, index) {
-                  return AccordianPayment(payment: payments![index], isInvoice: widget.isInvoice);
+                  return AccordianPayment(
+                      payment: payments![index], isInvoice: widget.isInvoice);
                 },
               ),
             ),
           ),
         ],
       ),
+      //---
+      
+      //---------
     );
   }
 }

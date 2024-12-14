@@ -38,27 +38,19 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
     });
   }
 
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  // }
-
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // ref.read(chequeProviderNotifier);
-    // final watchChequeDeposits = ref.watch(chequeDepositProviderNotifier);
-    // final readChequeDepositsNotifier = ref.read(chequeDepositProviderNotifier.notifier);
-    // final readSelectedCheque = ref.read(selectedChequeProviderNotifier);
-
+   
      final watchChequeDeposits = ref.watch(chequeDepositProvider);
     final chequeDepositsNotifier = ref.read(chequeDepositProvider.notifier);
     final selectedChequesNotifier = ref.read(selectedChequeProviderNotifier.notifier);
 
-    // final selectedCheques = ref.watch(selectedChequeProviderNotifier);
-    // final cheques = ref.watch(chequeNotifierProvider);
-    // final chequeNotifier = ref.read(chequeNotifierProvider.notifier);
-
+   
     final isWideScreen = MediaQuery.of(context).size.width >= 860;
     final router = GoRouter.of(context);
 
@@ -74,11 +66,10 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
                 width: 350,
                 child: TextField(
                   onChanged: (text) {
-                    // setState(() {
-                    //   readChequeDepositsNotifier.searchChequeDeposits(text);
-                    // });
-                      chequeDepositsNotifier.searchChequeDeposits(text);
-                  },
+                    setState(() {
+                     chequeDepositsNotifier.searchChequeDeposits(text);
+                    }); },
+
                   decoration: InputDecoration(
                     hintText: 'Hinted Search Text',
                     suffixIcon: IconButton(onPressed: () {  },icon: const Icon(Icons.search),),
@@ -94,8 +85,7 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Cheques Deposits.',
+                  const Text( 'Cheques Deposits.',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -108,10 +98,9 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
                 width: 350,
                 child: TextField(
                   onChanged: (text) {
-                    // setState(() {
-                    //   readChequeDepositsNotifier.searchChequeDeposits(text);
-                    // });
-                    chequeDepositsNotifier.searchChequeDeposits(text);
+                    setState(() {
+                     chequeDepositsNotifier.searchChequeDeposits(text);
+                    });
                   },
                   decoration: InputDecoration(
                     hintText: 'Hinted Search Text',
@@ -127,8 +116,6 @@ class _ChequeDepositScreenState extends ConsumerState<ChequeDepositScreen> {
                     children: [
                       IconButton(icon: const Icon(Icons.add_circle),
                        onPressed: () {
-                       // readSelectedCheque.clear();
-                        //selectedChequesNotifier.state = [];
                           selectedChequesNotifier.clearCheques();
                         router.go(
                           '${AppRouter.chequeDeposit.path}${AppRouter.addChequeDeposit.path}', 

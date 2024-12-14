@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yalapay/FB_Providers/update_cheques_provider.dart';
 import 'package:yalapay/models/cheque.dart';
 import 'package:yalapay/models/simpleDate.dart';
-import 'package:yalapay/providers/cheque_checked_provider.dart';
-import 'package:yalapay/providers/updated_cheques_provider.dart';
+import '../FB_Providers/cheque_check_provider.dart';
+
 
 class ChequeDepositCard extends ConsumerStatefulWidget {
   final Cheque cheque;

@@ -59,7 +59,31 @@ class Cheque {
       'chequeImageUri': chequeImageUri,
     };
   }
-
+Cheque copyWith({
+    int? chequeNo,
+    double? amount,
+    String? drawer,
+    String? bankName,
+    String? status,
+    String? chequeImageUri,
+    String? returnReason,
+    DateTime? receivedDate,
+    DateTime? dueDate,
+    DateTime? cashedDate,
+  }) {
+    return Cheque(
+      chequeNo ?? this.chequeNo,
+      amount ?? this.amount,
+      drawer ?? this.drawer,
+      bankName ?? this.bankName,
+      status ?? this.status,
+      receivedDate ?? this.receivedDate,
+      dueDate ?? this.dueDate,
+      chequeImageUri ?? this.chequeImageUri,
+      returnReason ?? this.returnReason,
+      cashedDate ?? this.cashedDate,
+    );
+  }
  
 
   @override

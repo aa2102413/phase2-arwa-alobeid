@@ -56,7 +56,6 @@ class _ChequeScreenState extends ConsumerState<ChequesScreen> {
 
   @override
   Widget build(BuildContext context) {
-   // final awaitingCheques = ref.read(chequeProviderNotifier.notifier).filterList('Awaiting');
     final router = GoRouter.of(context);
     final cheques = ref.watch(chequeNotifierProvider);
 final awaitingCheques =

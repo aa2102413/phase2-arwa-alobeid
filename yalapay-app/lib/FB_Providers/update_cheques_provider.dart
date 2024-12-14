@@ -4,30 +4,40 @@ import 'package:yalapay/models/cheque.dart';
 import '../FB_Repositories/cheque_repo.dart';
 
 class UpdatedChequesNotifier extends StateNotifier<List<Cheque>> {
- UpdatedChequesNotifier() : super(const []);
+UpdatedChequesNotifier() : super(const []){ 
+    initializeState();
+
+}
   late final ChequeRepo _chequeRepo;
 
-  Future<List<Cheque>> build() async{
+  void initializeState() {
+    _chequeRepo.observeCheques().listen((cheques) {
+      state = cheques;
+    }).onError((error) {
+      print("Error observing cheques: $error");
+    });
+  }
 
-   _chequeRepo.observeCheques().listen((cheques) {
+    void addCheque(Cheque cheque) async {
+    await _chequeRepo.addCheque(cheque);
+    state = _chequeRepo.cheques.reversed.toList();
+  }
 
-      state = cheques;}).onError((error) { print(error);}); return [];}
-  void addCheque(Cheque cheque) {_chequeRepo.addCheque(cheque);}
 
  void updateChequeStatusAndCashedDate(Cheque cheque, String status, DateTime cashedDate, String returnReason) {
-    state = state.map((element) {if (element.chequeNo == cheque.chequeNo) {
-        return Cheque(
-          element.chequeNo,
-          element.amount,
-          element.drawer,
-          element.bankName,
-          status,
-          element.receivedDate,
-          element.dueDate,
-          element.chequeImageUri,
-          returnReason,
-          cashedDate,  ); } return element; }).toList();}
+  final updatedState = state.map((element) {
+    if (element.chequeNo == cheque.chequeNo) {
+      return element.copyWith(
+        status: status,
+        cashedDate: cashedDate,
+        returnReason: returnReason,
+      );
+    }
+    return element;
+  }).toList();
 
+  state = updatedState;
+}
 
    void clearCheques() {state = [];}
    

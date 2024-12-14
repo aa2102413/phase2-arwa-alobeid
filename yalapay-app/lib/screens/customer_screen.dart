@@ -31,9 +31,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-  }
-
+    super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +40,6 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
 
     final isWideScreen = MediaQuery.of(context).size.width >= 860;
     final router = GoRouter.of(context);
-    
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(

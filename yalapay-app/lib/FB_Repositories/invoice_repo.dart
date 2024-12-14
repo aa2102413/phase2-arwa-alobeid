@@ -14,8 +14,9 @@ class InvoiceRepo {
     invoiceRef = _db.collection('invoices');
   }
 
-  List<Invoice> get invoices => invoices;
-  set invoices(List<Invoice> invoices) => invoices = invoices;
+  List<Invoice> _invoices = [];
+  List<Invoice> get invoices => _invoices;
+  set invoices(List<Invoice> invoices) => _invoices = invoices;
 
   Stream<List<Invoice>> observeInvoices() {
     return invoiceRef.snapshots().map((snapshot) {
@@ -25,16 +26,42 @@ class InvoiceRepo {
     });
   }
 
-  Future<Invoice?> getInvoiceById(int id) =>
+  Future<List<Invoice>> initInvoices() async {
+    List<Invoice> invoices = [];
+    final snapshot = await invoiceRef.get();
+    if (snapshot.docs.isEmpty) {
+      var paymentData =
+          await rootBundle.loadString('assets/data/invoices.json');
+      var paymentsMap = jsonDecode(paymentData);
+      invoices = paymentsMap
+          .map<Payment>((payment) => Invoice.fromJson(payment))
+          .toList();
+      final batch = _db.batch();
+      for (var invoice in invoices) {
+        var docRef = invoiceRef.doc(invoice.id.toString());
+        batch.set(docRef, invoice.toJson());
+      }
+      await batch.commit();
+    }
+    //  else {
+    //   // Load from Firestore
+    //   invoices = snapshot.docs
+    //       .map((doc) => Invoice.fromJson(doc.data() as Map<String, dynamic>))
+    //       .toList();
+    // }
+    return invoices;
+  }
+
+  Future<Invoice> getInvoiceById(int id) =>
       invoiceRef.doc(id as String?).get().then((snapshot) {
         return Invoice.fromJson(snapshot.data() as Map<String, dynamic>);
       });
 
   Future<void> addInvoice(Invoice invoice) async {
-    var docId = invoiceRef.doc().id;
-    invoice.id = docId as int;
-    await invoiceRef.doc(docId).set(invoice.toJson());
-    //await invoiceRef.add(invoice.toJson());
+    // var docId = invoiceRef.doc().id;
+    // invoice.id = docId as int;
+    // await invoiceRef.doc(docId).set(invoice.toJson());
+    await invoiceRef.add(invoice.toJson());
   }
 
   Future<void> deleteInvoice(Invoice invoice) async {
@@ -112,28 +139,5 @@ class InvoiceRepo {
 
       return matchesId || matchesDescription || matchesStatus;
     }).toList();
-  }
-
-  Future<List<Invoice>> initInvoices() async {
-    List<Invoice> invoices = [];
-    final snapshot = await invoiceRef.get();
-    if (snapshot.docs.isEmpty) {
-      var paymentData =
-          await rootBundle.loadString('assets/data/invoices.json');
-      var paymentsMap = jsonDecode(paymentData);
-      invoices = paymentsMap
-          .map<Payment>((payment) => Invoice.fromJson(payment))
-          .toList();
-
-      for (var invoice in invoices) {
-        await invoiceRef.doc(invoice.id.toString()).set(invoice.toJson());
-      }
-    } else {
-      // Load from Firestore
-      invoices = snapshot.docs
-          .map((doc) => Invoice.fromJson(doc.data() as Map<String, dynamic>))
-          .toList();
-    }
-    return invoices;
   }
 }

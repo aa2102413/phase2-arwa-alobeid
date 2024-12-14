@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison, recursive_getters
+
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -35,13 +37,13 @@ set payments(List<Payment> payments) => payments = payments;
       var paymentsMap = jsonDecode(paymentData);
        payments = paymentsMap.map<Payment>((payment) => Payment.fromJson(payment)).toList();
       
-       for (var payment in  payments) {
-        await paymentRef.doc(payment.id.toString()).set(payment.toJson());
-    }
+    final batch = _db.batch();
+      for (var payment in payments) {
+    var docRef = paymentRef.doc(payment.id.toString());
+     batch.set(docRef, payment.toJson());}
+    await batch.commit();
 
-    }else { // Load from Firestore
-    payments = snapshot.docs.map((doc) =>Payment.fromJson(doc.data() as Map<String, dynamic>)).toList();
-  }
+    }
     return payments;
   }
 
@@ -58,7 +60,7 @@ set payments(List<Payment> payments) => payments = payments;
 
 
  Future<Payment> getPaymentById(int id) async {
-    final snapshot = await paymentRef.doc(id as String?).get();
+    final snapshot = await paymentRef.doc(id.toString()).get();
     return Payment.fromJson(snapshot.data() as Map<String, dynamic>);
   }
 
@@ -111,10 +113,7 @@ set payments(List<Payment> payments) => payments = payments;
  
 
   Future<void> addPayment(Payment payment) async {
-
-    var docId = paymentRef.doc().id;
-    payment.id = docId as int;
-    await paymentRef.doc(docId).set(payment.toJson());
+    await paymentRef.add(payment.toJson());
   }
 
 
@@ -154,3 +153,4 @@ set payments(List<Payment> payments) => payments = payments;
   //   }
     
   // }
+

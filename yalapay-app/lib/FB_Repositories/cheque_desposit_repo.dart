@@ -9,14 +9,15 @@ import '../models/cheque_deposit.dart';
 class ChequeDespositRepo {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   late final CollectionReference chequedepositRef;
-
   ChequeDespositRepo() {
     chequedepositRef = _db.collection('ChequeDeposits'); }
 
   List<BankAccount> _bankAccounts = [];
-  List<ChequeDeposit> get chequeDeposits => chequeDeposits;
-  set chequeDeposits(List<ChequeDeposit> chequeDeposits) =>
-      chequeDeposits = chequeDeposits;
+  //FIX 
+ List<ChequeDeposit> _chequeDeposits = [];
+ 
+List<ChequeDeposit> get chequeDeposits => _chequeDeposits;
+ set chequeDeposits(List<ChequeDeposit> value) => _chequeDeposits = value;
 
   Stream<List<ChequeDeposit>> observeChequeDeposits() {
     return chequedepositRef.snapshots().map((snapshot) {
@@ -51,22 +52,19 @@ class ChequeDespositRepo {
     }
     return chequeDeposits;
   }
-
   Future<List<BankAccount>> initBankAccounts() async {
     var bankAccountData =
         await rootBundle.loadString('assets/data/bank-accounts.json');
     var bankAccountsMap = jsonDecode(bankAccountData);
-
     _bankAccounts = bankAccountsMap
         .map<BankAccount>((bankAccount) => BankAccount.fromJson(bankAccount))
         .toList();
     return _bankAccounts;
   }
-
   get bankAccounts => _bankAccounts;
 
   Future<ChequeDeposit?> getChequeDepositById(int id) async =>
-      chequedepositRef.doc(id as String?).get().then((snapshot) {
+      chequedepositRef.doc(id.toString() ).get().then((snapshot) {
         return ChequeDeposit.fromJson(snapshot.data() as Map<String, dynamic>);
       });
 
@@ -75,9 +73,10 @@ class ChequeDespositRepo {
   }
 
   Future<void> addChequeDeposit(ChequeDeposit chequeDeposit) async {
-    var docId = chequedepositRef.doc().id;
-    chequeDeposit.id = int.parse(docId);
-    await chequedepositRef.doc(docId).set(chequeDeposit.toJson());
+    // var docId = chequedepositRef.doc().id;
+    // chequeDeposit.id = int.parse(docId);
+    // await chequedepositRef.doc(docId).set(chequeDeposit.toJson());
+    await chequedepositRef.add(chequeDeposit.toJson());
   }
 
   Future<void> deleteChequeDeposit(ChequeDeposit chequeDeposit) async {

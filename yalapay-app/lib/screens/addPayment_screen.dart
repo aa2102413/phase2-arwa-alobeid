@@ -14,6 +14,8 @@ import 'package:yalapay/providers/invoice_provider.dart';
 import 'package:yalapay/providers/login_provider.dart';
 import 'package:yalapay/providers/payment_provider.dart';
 import 'package:yalapay/routes/app_router.dart';
+
+import '../FB_Providers/cheque_provider.dart';
 // TODO UNCOMMENT ON PHASE 2
 // import 'dart:typed_data';
 // import 'package:flutter/foundation.dart';
@@ -63,8 +65,8 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen>{
   @override
   void initState() {
     super.initState();
-    final chequeImages = ref.read(chequeProviderNotifier.notifier).chequeImages;
-    final readChequeNotifier = ref.read(chequeProviderNotifier.notifier);
+    final chequeImages = ref.read(chequeNotifierProvider.notifier).chequeImages;
+    final readChequeNotifier = ref.read(chequeNotifierProvider.notifier);
 
     if(!widget.isAdd){
       if(widget.payment?.paymentMode.toLowerCase() == 'Card'.toLowerCase()) {
@@ -85,16 +87,17 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen>{
       if(chequeNo! > 0 && !update && widget.payment?.paymentMode == 'Cheque') {
         selectedDrawer = widget.payment?.invoiceNo.toString();
         chequeController.text = chequeNo.toString();
+       // Cheque? chequeFuture= 
 
-        Cheque? tempCheque = readChequeNotifier.getChequeById(chequeNo ?? 0);
+        Cheque? tempCheque = readChequeNotifier.getChequeById(chequeNo ?? 0) as Cheque?;
 
         for(var chequeImage in chequeImages) {
-          if(chequeImage.image == tempCheque.chequeImageUri) {
+          if(chequeImage.image == tempCheque?.chequeImageUri) {
             selectedCheque = chequeImage.image;
           }
         }
 
-        date = tempCheque.receivedDate;
+        date = tempCheque!.receivedDate;
         dueDate = tempCheque.dueDate;
         selectedBank = tempCheque.bankName;
       }

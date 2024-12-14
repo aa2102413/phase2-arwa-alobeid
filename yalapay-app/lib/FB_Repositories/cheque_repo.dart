@@ -23,25 +23,26 @@ class ChequeRepo {
   }
 
   Future<List<Cheque>> initCheques() async {
-    List<Cheque> _cheques = [];
+    List<Cheque> cheques = [];
     final snapshot = await chequeRef.get();
     if (snapshot.docs.isEmpty) {
       var chequeData = await rootBundle.loadString('assets/data/cheques.json');
       var chequesMap = jsonDecode(chequeData);
 
-      _cheques =
+      cheques =
           chequesMap.map<Cheque>((cheque) => Cheque.fromJson(cheque)).toList();
-      for (var cheque in _cheques) {
+      for (var cheque in cheques) {
         await chequeRef.doc(cheque.chequeNo.toString()).set(cheque.toJson());
       }
-    } else {
-      // Load from Firestore
-      _cheques = snapshot.docs
-          .map((doc) => Cheque.fromJson(doc.data() as Map<String, dynamic>))
-          .toList();
-    }
+    } 
+    // else {
+    //   // Load from Firestore
+    //   cheques = snapshot.docs
+    //       .map((doc) => Cheque.fromJson(doc.data() as Map<String, dynamic>))
+    //       .toList();
+    // }
 
-    return _cheques;
+    return cheques;
   }
 
   Future<Cheque?> getChequeBychequeNo(String chequeNo) =>
@@ -81,8 +82,8 @@ class ChequeRepo {
     }
   }
 
-  Future<Cheque?> getChequeById(int id) async {
-    final snapshot = await chequeRef.doc(id as String?).get();
+  Future<Cheque> getChequeById(int id) async {
+    final snapshot = await chequeRef.doc(id.toString()).get();
     return Cheque.fromJson(snapshot.data() as Map<String, dynamic>);
   }
 

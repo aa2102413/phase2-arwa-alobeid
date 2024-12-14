@@ -9,19 +9,23 @@ import '../FB_Repositories/invoice_repo.dart';
 import '../models/invoice.dart';
 
 class InvoiceNotifier extends StateNotifier<List<Invoice>> {
-  InvoiceNotifier() : super(const []);
-  late final InvoiceRepo _invoiceRepo;
+ late final InvoiceRepo _invoiceRepo;
 
-
-
-  List<Invoice> build() {
+  InvoiceNotifier() : super(const []) {
+    _invoiceRepo = InvoiceRepo(); 
     initalizeState();
-    return [];
   }
+ 
+  void initalizeState(){
+   _invoiceRepo.observeInvoices().listen(( invoices) {
+      state = invoices;
+     }).onError((error) {
+      print("Error observing invoices: $error");
+    });
+ 
+  }
+Stream<List<Invoice>> observeInvoices()=> _invoiceRepo.observeInvoices();
 
-  void initalizeState() async {
-    state = (await _invoiceRepo.initInvoices()).reversed.toList();
-  }
 
   Future<Invoice?> getInvoiceById(int id) async {
     return await _invoiceRepo.getInvoiceById(id);
@@ -31,19 +35,17 @@ class InvoiceNotifier extends StateNotifier<List<Invoice>> {
     final watchPayment = paymentNotifierProvider;
     final watchCheque = chequeNotifierProvider;
     state = await _invoiceRepo.searchInvoices(text, watchPayment as List<Payment>, watchCheque as List<Cheque>);
-    // List.from(
-    //     _invoiceRepo.searchInvoices(text, watchPayment, watchCheque).reversed);
+    
   }
 
-  Future<void> addInvoice(Invoice invoice) async {
+   Future<void> addInvoice(Invoice invoice) async {
     await _invoiceRepo.addInvoice(invoice);
-    //state = List.from( _invoiceRepo.invoices.reversed);
-    state = [ invoice, ...state];
+    state = _invoiceRepo.invoices.reversed.toList();
   }
 
-  Future<void> deleteInvoice(Invoice invoice) async {
+   Future<void> deleteInvoice(Invoice invoice) async {
     await _invoiceRepo.deleteInvoice(invoice);
-    state = state.where((invoiceE)=>invoiceE.id!=invoice.id).toList();
+    state = state.where((e) => e.id != invoice.id).toList();
   }
 
   int getlastId() {
@@ -59,6 +61,19 @@ class InvoiceNotifier extends StateNotifier<List<Invoice>> {
     await _invoiceRepo.getByInvoiceDate(fromDate, toDate);
  state = (await _invoiceRepo.getByInvoiceDate(fromDate, toDate)).reversed.toList();
   }
+
+void resetState() {
+  state =_invoiceRepo.invoices.reversed.toList();
+}
+
+}
+
+final invoiceNotifierProvider =
+    StateNotifierProvider<InvoiceNotifier, List<Invoice>>(
+        (ref) => InvoiceNotifier());
+
+
+
 
   // (List<Invoice> invoices, int count, double amount) filterInvoices(
   //     DateTime fromDate, DateTime toDate, String status) {
@@ -120,13 +135,3 @@ class InvoiceNotifier extends StateNotifier<List<Invoice>> {
   //     return (all, all.length, paidTotal + partiallyPaidTotal + pendingTotal);
   //   }
   // }
-
-void resetState() {
-  state =_invoiceRepo.invoices.reversed.toList();
-}
-
-}
-
-final invoiceNotifierProvider =
-    StateNotifierProvider<InvoiceNotifier, List<Invoice>>(
-        (ref) => InvoiceNotifier());

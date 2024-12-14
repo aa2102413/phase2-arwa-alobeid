@@ -3,71 +3,53 @@ import 'package:yalapay/FB_Providers/cheque_provider.dart';
 import 'package:yalapay/models/cheque.dart';
 import '../FB_Repositories/payment_repo.dart';
 import '../models/payment.dart';
+
 class PaymentNotifier extends StateNotifier<List<Payment>> {
-  PaymentNotifier() : super(const []);
+  PaymentNotifier() : super(const []){
+ initalizeState();
+  }
   late final PaymentRepo _paymentRepo;
 
-  
-
-  Future<List<Payment>> build() async {
-   await  _paymentRepo.initBanks();  _paymentRepo.initBanks(); 
-    initalizeState();
-    return [];
-  }
-
   void initalizeState() async {
+  //  _paymentRepo.observePayments();
     _paymentRepo.observePayments().listen((payments) {
-      state =payments;
+      state = payments;
     }).onError((error) {
-      print(error);
+       print("Error observing payments: $error");
     });
-
     //state = (await _paymentRepo.initPayments()).reversed.toList();
   }
 
-void searchPayments(String text) async {
-  final cheques = chequeNotifierProvider;
-  final payments = await _paymentRepo.searchPayments(text, cheques as List<Cheque>);
-  state = List.from(payments.reversed);
-}
-
-void addPayment(Payment payment) {
-   _paymentRepo.addPayment(payment);
-  state = List.from( _paymentRepo.payments.reversed); }
-
-
-void deletePayment(Payment payment) async{
-  await  _paymentRepo.deletePayment(payment);
-  state = List.from(_paymentRepo.payments.reversed);
+  void searchPayments(String text) async {
+    final cheques = chequeNotifierProvider;
+    final payments =
+        await _paymentRepo.searchPayments(text, cheques as List<Cheque>);
+    state = payments.reversed.toList();
   }
 
-  void updatePayment(Payment payment) async{
-  await _paymentRepo.updatePayment(payment);
-  state = List.from(_paymentRepo.payments.reversed);
+  void addPayment(Payment payment) {
+    _paymentRepo.addPayment(payment);
+    state = _paymentRepo.payments.reversed.toList();
   }
 
-  Future<List<Payment>> paymentState(int id) {
-    return _paymentRepo.getPaymentsByInvoiceNo(id);
+  void deletePayment(Payment payment) async {
+    await _paymentRepo.deletePayment(payment);
+  state = _paymentRepo.payments.reversed.toList();
   }
 
-  int getlastId() {
-    return _paymentRepo.payments.last.id;
-  }
-
-  List<String> getBanks() {
-    return _paymentRepo.banks;
+  void updatePayment(Payment payment) async {
+    await _paymentRepo.updatePayment(payment);
+   state = _paymentRepo.payments.reversed.toList();
   }
 
   void resetState() {
-    state = List.from(_paymentRepo.payments.reversed);
+      state = _paymentRepo.payments.reversed.toList();
   }
-
-
 }
 
 final paymentNotifierProvider =
-   StateNotifierProvider<PaymentNotifier, List<Payment>>(
-       (ref) => PaymentNotifier());
+    StateNotifierProvider<PaymentNotifier, List<Payment>>(
+        (ref) => PaymentNotifier());
 
 
        // @override

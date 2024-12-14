@@ -30,6 +30,8 @@ class _AccordianChequesDepositState
   void initState() {
     super.initState();
     ref.read(chequeNotifierProvider.notifier).initalizeState();
+    ref.read(chequeDepositProvider.notifier);
+    //ref.read(updatedChequesProviderNotifier.notifier);
   }
 
   void setIsIconUp(bool value) {
@@ -42,9 +44,13 @@ class _AccordianChequesDepositState
   Widget build(BuildContext context) {
     final readChequeNotifier = ref.watch(chequeNotifierProvider.notifier);
     final readChequeDepositNotifier = ref.watch(chequeDepositProvider.notifier);
-    final readUpdatedChequesProvider = ref.watch(updatedChequesProviderNotifier.notifier);
+    final readUpdatedChequesProvider =
+        ref.watch(updatedChequesProviderNotifier.notifier);
 
-    Future<ChequeDeposit?> queryChequeDeposit = readChequeDepositNotifier.getChequeDepositById(widget.chequeDeposit.id);
+    ChequeDeposit queryChequeDeposit = readChequeDepositNotifier
+        .getChequeDepositById(widget.chequeDeposit.id) as ChequeDeposit;
+    //String s = queryChequeDeposit.status;
+
     amountDue = 0;
     amountPaid = 0;
 
@@ -87,22 +93,11 @@ class _AccordianChequesDepositState
                       horizontal: 8.0, vertical: 4.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
-                    color: readChequeDepositNotifier
-                                .getChequeDepositById(widget.chequeDeposit.id)!
-                                .status ==
-                            'Cashed'
+                    color: queryChequeDeposit.status == 'Cashed'
                         ? Colors.green.withOpacity(0.15)
-                        : readChequeDepositNotifier
-                                    .getChequeDepositById(
-                                        widget.chequeDeposit.id)!
-                                    .status ==
-                                'Cashed with Returns'
+                        : queryChequeDeposit.status == 'Cashed with Returns'
                             ? Colors.blue.withOpacity(0.15)
-                            : readChequeDepositNotifier
-                                        .getChequeDepositById(
-                                            widget.chequeDeposit.id)!
-                                        .status ==
-                                    'Returned'
+                            : queryChequeDeposit.status == 'Returned'
                                 ? Colors.red.withOpacity(0.15)
                                 : Colors.amber.shade600.withOpacity(0.15),
                   ),
@@ -110,23 +105,11 @@ class _AccordianChequesDepositState
                   child: Text(
                     widget.chequeDeposit.status,
                     style: TextStyle(
-                        color: readChequeDepositNotifier
-                                    .getChequeDepositById(
-                                        widget.chequeDeposit.id)!
-                                    .status ==
-                                'Cashed'
+                        color: queryChequeDeposit.status == 'Cashed'
                             ? Colors.green
-                            : readChequeDepositNotifier
-                                        .getChequeDepositById(
-                                            widget.chequeDeposit.id)!
-                                        .status ==
-                                    'Cashed with Returns'
+                            : queryChequeDeposit.status == 'Cashed with Returns'
                                 ? Colors.blue
-                                : readChequeDepositNotifier
-                                            .getChequeDepositById(
-                                                widget.chequeDeposit.id)!
-                                            .status ==
-                                        'Returned'
+                                : queryChequeDeposit.status == 'Returned'
                                     ? Colors.red
                                     : Colors.amber.shade600,
                         fontWeight: FontWeight.bold,
@@ -271,20 +254,12 @@ class _AccordianChequesDepositState
                                     horizontal: 8.0, vertical: 4.0),
                                 margin: const EdgeInsets.only(right: 4.0),
                                 decoration: BoxDecoration(
-                                  color: readChequeNotifier
-                                              .getChequeById(chequeNo)
-                                              .status ==
-                                          'Cashed'
+                                  color: queryChequeDeposit.status == 'Cashed'
                                       ? Colors.green.withOpacity(0.15)
-                                      : readChequeNotifier
-                                                  .getChequeById(chequeNo)
-                                                  .status ==
-                                              'Deposited'
+                                      : queryChequeDeposit.status == 'Deposited'
                                           ? Colors.amber.shade600
                                               .withOpacity(0.15)
-                                          : readChequeNotifier
-                                                      .getChequeById(chequeNo)
-                                                      .status ==
+                                          : queryChequeDeposit.status ==
                                                   'Returned'
                                               ? Colors.red.withOpacity(0.15)
                                               : Colors.blue.withOpacity(0.15),
@@ -293,23 +268,16 @@ class _AccordianChequesDepositState
                                 child: Text(
                                   '$chequeNo',
                                   style: TextStyle(
-                                      color: readChequeNotifier
-                                                  .getChequeById(chequeNo)
-                                                  .status ==
-                                              'Cashed'
-                                          ? Colors.green
-                                          : readChequeNotifier
-                                                      .getChequeById(chequeNo)
-                                                      .status ==
-                                                  'Deposited'
-                                              ? Colors.amber.shade600
-                                              : readChequeNotifier
-                                                          .getChequeById(
-                                                              chequeNo)
-                                                          .status ==
-                                                      'Returned'
-                                                  ? Colors.red
-                                                  : Colors.blue,
+                                      color:
+                                          queryChequeDeposit.status == 'Cashed'
+                                              ? Colors.green
+                                              : queryChequeDeposit.status ==
+                                                      'Deposited'
+                                                  ? Colors.amber.shade600
+                                                  : queryChequeDeposit.status ==
+                                                          'Returned'
+                                                      ? Colors.red
+                                                      : Colors.blue,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12),
                                 ),
@@ -621,9 +589,8 @@ class _AccordianChequesDepositState
                                       TextButton(
                                         onPressed: () {
                                           for (var cheque in selectedCheques) {
-                                            readChequeNotifier
-                                                .getChequeById(cheque.chequeNo)
-                                                .status = 'Awaiting';
+                                            Cheque chequeById = readChequeNotifier.getChequeById(cheque.chequeNo) as Cheque;
+                                            chequeById.status = 'Awaiting';
                                           }
                                           readChequeDepositNotifier
                                               .deleteChequeDeposit(

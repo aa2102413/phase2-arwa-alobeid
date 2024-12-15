@@ -73,9 +73,6 @@ List<ChequeDeposit> get chequeDeposits => _chequeDeposits;
   }
 
   Future<void> addChequeDeposit(ChequeDeposit chequeDeposit) async {
-    // var docId = chequedepositRef.doc().id;
-    // chequeDeposit.id = int.parse(docId);
-    // await chequedepositRef.doc(docId).set(chequeDeposit.toJson());
     await chequedepositRef.add(chequeDeposit.toJson());
   }
 

@@ -30,6 +30,7 @@ class ChequeDepositNotifier extends StateNotifier<List<ChequeDeposit>> {
   void deleteChequeDeposit(ChequeDeposit chequeDeposit) async {
     await _chequeDespositRepo.deleteChequeDeposit(chequeDeposit);
     state = _chequeDespositRepo.chequeDeposits.reversed.toList(); }
+    
 
   void updateChequeDeposit(ChequeDeposit chequeDeposit)async {
     await  _chequeDespositRepo.updateChequeDeposit(chequeDeposit);
@@ -44,6 +45,7 @@ class ChequeDepositNotifier extends StateNotifier<List<ChequeDeposit>> {
 
   void resetState() { state = _chequeDespositRepo.chequeDeposits.reversed.toList();
   }
+
 }
 
 final chequeDepositProvider =

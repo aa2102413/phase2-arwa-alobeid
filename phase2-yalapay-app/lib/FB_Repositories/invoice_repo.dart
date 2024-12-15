@@ -43,12 +43,6 @@ class InvoiceRepo {
       }
       await batch.commit();
     }
-    //  else {
-    //   // Load from Firestore
-    //   invoices = snapshot.docs
-    //       .map((doc) => Invoice.fromJson(doc.data() as Map<String, dynamic>))
-    //       .toList();
-    // }
     return invoices;
   }
 
@@ -58,14 +52,10 @@ class InvoiceRepo {
       });
 
   Future<void> addInvoice(Invoice invoice) async {
-    // var docId = invoiceRef.doc().id;
-    // invoice.id = docId as int;
-    // await invoiceRef.doc(docId).set(invoice.toJson());
     await invoiceRef.add(invoice.toJson());
   }
 
   Future<void> deleteInvoice(Invoice invoice) async {
-    //invoiceRef.doc(invoice.id as String?).delete();
     var snapshot = await invoiceRef.where('id', isEqualTo: invoice.id).get();
     if (snapshot.docs.isNotEmpty) {
       await invoiceRef.doc(snapshot.docs.first.id).delete();
@@ -73,7 +63,6 @@ class InvoiceRepo {
   }
 
   Future<void> updateInvoice(Invoice invoice) async {
-    //invoiceRef.doc(invoice.id as String?).update(invoice.toJson());
     var snapshot = await invoiceRef.where('id', isEqualTo: invoice.id).get();
     if (snapshot.docs.isNotEmpty) {
       await invoiceRef.doc(snapshot.docs.first.id).update(invoice.toJson());
@@ -87,7 +76,6 @@ class InvoiceRepo {
         .where('dueDate', isLessThan: toDate)
         .get();
 
-    //return snapshot.docs.map((doc) => Invoice.fromJson(doc.data())).toList();
     List<Invoice> invoices = queryResult.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
       return Invoice.fromJson(data);

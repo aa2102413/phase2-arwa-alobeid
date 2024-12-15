@@ -41,6 +41,10 @@ class ChequeNotifier extends StateNotifier<List<Cheque>> {
     state = _chequeRepo.cheques.reversed.toList();
   }
 
+  Future<String?> getChequeImageUrl(String imagePath) async {
+      return await _chequeRepo.getChequeImageUrl(imagePath);
+  }
+
   Future<List<Cheque>> filterList(String status) async {
     return List.from(await _chequeRepo.filterList(status));
   }

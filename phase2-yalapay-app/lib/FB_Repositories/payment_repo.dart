@@ -43,20 +43,16 @@ set payments(List<Payment> payments) => payments = payments;
      batch.set(docRef, payment.toJson());}
     await batch.commit();
 
-    }
-    return payments;
-  }
+    } return payments;}
 
 
  Future<List<String>> initBanks() async {
     var bankData = await rootBundle.loadString('assets/data/banks.json');
     var banksMap = jsonDecode(bankData);
-
     _banks = banksMap.cast<String>();
-    return _banks;
-  }
-
-  get banks => _banks;
+    return _banks; }
+      get banks => _banks;
+  
 
 
  Future<Payment> getPaymentById(int id) async {
@@ -110,19 +106,12 @@ set payments(List<Payment> payments) => payments = payments;
     return matchesId || matchesContent || matchesChequeStatus || matchChequeDetails;
   }).toList();
   }
- 
-
   Future<void> addPayment(Payment payment) async {
     await paymentRef.add(payment.toJson());
   }
-
-
   Future<void> deletePayment(Payment payment) => paymentRef.doc(payment.id as String?).delete();
 
   Future<void> updatePayment(Payment payment) => paymentRef.doc(payment.id as String?).update(payment.toJson());
-
-
-
   Future<List<Payment>> loadPayments(String invoiceNo) async {
     final queryResult =
         await paymentRef.where('invoiceNo', isEqualTo: invoiceNo).get();
@@ -136,21 +125,3 @@ set payments(List<Payment> payments) => payments = payments;
 
 
 }
-
-
-  // Future<List<Payment>> getPaymentsByInvoiceNo(int invoiceNo)async {
-  //   try{
-  //     final snapshot = await paymentRef.where('invoiceNo', isEqualTo: invoiceNo).get();
-  //     return snapshot.docs
-  //         .map((doc) => Payment.fromJson(doc.data() as Map<String, dynamic>))
-  //         .toList();
-
-
-
-  //   }catch(e){
-  //      print('Error fetching payments: $e');
-  //      return [];
-  //   }
-    
-  // }
-
